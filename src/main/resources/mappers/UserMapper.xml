@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ozj.weather.wf.mappers.UserMapper">
+
+    <resultMap id="BaseResultMap" type="ozj.weather.wf.domain.User">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="no" jdbcType="LONGVARCHAR" property="no"/>
+        <result column="name" jdbcType="LONGVARCHAR" property="name"/>
+        <result column="email" jdbcType="LONGVARCHAR" property="email"/>
+        <result column="password" jdbcType="LONGVARCHAR" property="password"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        `id`, `no`, `name`, `email`,  `password`
+    </sql>
+
+    <select id="selectById" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from `user`
+        where `id` = #{id,jdbcType=INTEGER} and `state` = 1
+    </select>
+    <select id="selectByNo" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from `user`
+        where `no` = #{no,jdbcType=VARCHAR} and `state` = 1
+    </select>
+    <select id="selectAllUser" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from `user`
+        where `state` = #{state,jdbcType=INTEGER}
+    </select>
+    <delete id="deleteById" parameterType="java.lang.Integer">
+        delete from `user`
+        where `id` = #{id,jdbcType=INTEGER}
+    </delete>
+
+    <delete id="deleteByNo" parameterType="java.lang.String">
+        delete from `user`
+        where `no` = #{no,jdbcType=VARCHAR}
+    </delete>
+
+    <insert id="insert" parameterType="ozj.weather.wf.domain.User">
+        <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Integer">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        insert into `user` (
+        `no`,
+        `name`,
+        `email`,
+        `password`
+        )
+        values (
+        #{no,jdbcType=LONGVARCHAR},
+        #{name,jdbcType=LONGVARCHAR},
+        #{email,jdbcType=LONGVARCHAR},
+        #{password,jdbcType=LONGVARCHAR}
+        )
+    </insert>
+    <update id="updateById" parameterType="ozj.weather.wf.domain.User">
+        update `user`
+        set
+        `no` = #{no,jdbcType=LONGVARCHAR},
+        `name` = #{name,jdbcType=LONGVARCHAR},
+        `email` = #{email,jdbcType=LONGVARCHAR},
+        `password` = #{password,jdbcType=LONGVARCHAR},
+        `state` = 1
+        where `id` = #{id,jdbcType=INTEGER}
+    </update>
+</mapper>

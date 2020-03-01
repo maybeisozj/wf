@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ozj.weather.wf.mappers.TaskMapper">
+
+    <resultMap id="BaseResultMap" type="ozj.weather.wf.domain.Task">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="TRIGGER_NAME" jdbcType="LONGVARCHAR" property="triggerName"/>
+        <result column="TRIGGER_GROUP" jdbcType="LONGVARCHAR" property="triggerGroup"/>
+        <result column="cityId" jdbcType="LONGVARCHAR" property="cityId"/>
+        <result column="cityName" jdbcType="LONGVARCHAR" property="cityName" />
+        <association
+                column="USER_ID"
+                select="ozj.weather.wf.mappers.UserMapper.selectById"
+                property="own">
+        </association>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        `id`, `TRIGGER_NAME`, `TRIGGER_GROUP`, `USER_ID`, `cityId`,`cityName`
+    </sql>
+
+    <select id="selectByTaskId" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from `task`
+        where `id` = #{taskId,jdbcType=INTEGER}
+    </select>
+
+    <select id="selectByUserId" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from `task`
+        where `USER_ID` = #{userId,jdbcType=INTEGER}
+    </select>
+
+    <select id="selectByTriggerName" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from `task`
+        where `TRIGGER_NAME` = #{triggerName,jdbcType=LONGVARCHAR}
+    </select>
+
+    <select id="selectByTriggerGroup" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from `task`
+        where `TRIGGER_GROUP` = #{triggerGroup,jdbcType=LONGVARCHAR}
+    </select>
+
+    <select id="selectByTriggerNameAndGroup" parameterType="java.util.Map" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from `task`
+        where `TRIGGER_NAME` = #{triggerName,jdbcType=LONGVARCHAR} and `TRIGGER_GROUP` = #{triggerGroup,jdbcType=LONGVARCHAR}
+    </select>
+
+    <insert id="insertTask" parameterType="ozj.weather.wf.domain.Task">
+        <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Integer">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        insert into `task` (
+        `TRIGGER_NAME`,
+        `TRIGGER_GROUP`,
+        `USER_ID`,
+        `cityId`,
+        `cityName`
+        )
+        values (
+        #{triggerName,jdbcType=LONGVARCHAR},
+        #{triggerGroup,jdbcType=LONGVARCHAR},
+        #{own.id,jdbcType=INTEGER},
+        #{cityId,jdbcType=LONGVARCHAR},
+        #{cityName,jdbcType=LONGVARCHAR}
+        )
+    </insert>
+
+    <update id="updateTask" parameterType="ozj.weather.wf.domain.Task">
+        <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Integer">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        update `task`
+        set
+        `TRIGGER_NAME` = #{triggerName,jdbcType=LONGVARCHAR},
+        `TRIGGER_GROUP` = #{triggerGroup,jdbcType=LONGVARCHAR},
+        `USER_ID` = #{own.id,jdbcType=INTEGER},
+        `cityId` = #{cityId,jdbcType=LONGVARCHAR},
+        `cityName` = #{cityName.jdbcType=LONGVARCHAR}
+        where
+        `id` = #{id,jdbcType=INTEGER}
+    </update>
+
+    <delete id="deleteTask" parameterType="ozj.weather.wf.domain.Task">
+        delete from `task`
+        where  `id` = #{id,jdbcType=INTEGER}
+    </delete>
+</mapper>
